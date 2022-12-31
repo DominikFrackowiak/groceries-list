@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { FaTrashAlt } from 'react-icons/fa'
 import AddItem from './AddItem'
 import SearchItem from './SearchItem'
+import apiRequest from './apiRequest'
 
 export default function Content() {
 	const API_URL = 'http://localhost:3000/items'
