@@ -4,17 +4,31 @@ import AddItem from './AddItem'
 import SearchItem from './SearchItem'
 
 export default function Content() {
-	const [items, setItems] = useState(
-		JSON.parse(localStorage.getItem('shoppingList')) || []
-	)
+	const API_URL = 'http://localhost:3000/items'
 
+	const [items, setItems] = useState([])
 	const [newItem, setNewItem] = useState('')
-
 	const [search, setSearch] = useState('')
+	const [fetchError, setFetchError] = useState(null)
+	const [isLoading, setIsLoading] = useState(true)
 
 	useEffect(() => {
-		localStorage.setItem('shoppingList', JSON.stringify(items))
-	}, [items])
+		const fetchData = async () => {
+			try {
+				const response = await fetch(API_URL)
+				if (!response.ok) throw Error('could not fetch the data')
+				const data = await response.json()
+				console.log(data)
+				setItems(data)
+				setFetchError(null)
+			} catch (err) {
+				setFetchError(err.message)
+			} finally {
+				setIsLoading(false)
+			}
+		}
+		fetchData()
+	}, [])
 
 	const handleCheck = id => {
 		const listItems = items.map(item =>
@@ -38,6 +52,12 @@ export default function Content() {
 
 	return (
 		<main>
+			{isLoading && (
+				<p style={{ color: 'red', marginTop: '10px' }}>Loading...</p>
+			)}
+			{fetchError && (
+				<p style={{ color: 'red', marginTop: '10px' }}>{fetchError}</p>
+			)}
 			<AddItem
 				newItem={newItem}
 				setNewItem={setNewItem}
@@ -45,7 +65,8 @@ export default function Content() {
 			/>
 			<SearchItem search={search} setSearch={setSearch} />
 
-			{items.length === 0 && <p>No items on the list</p>}
+			{!fetchError && items.length === 0 && <p>No items on the list</p>}
+
 			<ul>
 				{items
 					.filter(item =>
