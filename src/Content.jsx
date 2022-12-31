@@ -16,11 +16,6 @@ export default function Content() {
 		localStorage.setItem('shoppingList', JSON.stringify(items))
 	}, [items])
 
-	// const setAndSaveItems = itemsData => {
-
-	// 	setItems(newItems)
-	// }
-
 	const handleCheck = id => {
 		const listItems = items.map(item =>
 			item.id === id ? { ...item, checked: !item.checked } : item
