@@ -31,23 +31,57 @@ export default function Content() {
 		fetchData()
 	}, [])
 
-	const handleCheck = id => {
+	const handleCheck = async id => {
 		const listItems = items.map(item =>
 			item.id === id ? { ...item, checked: !item.checked } : item
 		)
 		setItems(listItems)
+
+		const myItem = listItems.filter(item => item.id === id)
+
+		const updateOptions = {
+			method: 'PATCH',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({ checked: myItem[0].checked }),
+		}
+
+		const reqUrl = `${API_URL}/${id}`
+		const result = await apiRequest(reqUrl, updateOptions)
+		if (result) setFetchError(result)
 	}
 
-	const handleDelete = id => {
+	const handleDelete = async id => {
 		const filteredItems = items.filter(item => item.id !== id)
 		setItems(filteredItems)
+
+		const deleteOptions = {
+			method: 'DELETE',
+		}
+		const reqUrl = `${API_URL}/${id}`
+		const result = await apiRequest(reqUrl, deleteOptions)
+		if (result) setFetchError(result)
 	}
 
-	const handleSubmit = e => {
+	const handleSubmit = async e => {
 		e.preventDefault()
 		if (!newItem) return
 
-		setItems([...items, { id: Date.now(), checked: false, item: newItem }])
+		const myNewItem = { id: Date.now(), checked: false, item: newItem }
+		setItems([...items, myNewItem])
+
+		const postOptions = {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(myNewItem),
+		}
+
+		const result = await apiRequest(API_URL, postOptions)
+		if (result) setFetchError(result)
+
 		setNewItem('')
 	}
 
